@@ -103,7 +103,7 @@ public:
 	}
 };
 
-class Newton : Interpolation {
+class Newton : public Interpolation {
 	deltaY masY;
 	double gValue;
 public:
