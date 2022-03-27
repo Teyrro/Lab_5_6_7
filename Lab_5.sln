@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab_5", "Lab_5\Lab_5.vcxproj", "{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Lab_5_py", "Lab_5_py\Lab_5_py.pyproj", "{B65607C5-B087-4D02-8618-7F42B7C4136B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|Any CPU.Build.0 = Debug|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|x64.ActiveCfg = Debug|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|x64.Build.0 = Debug|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|x86.ActiveCfg = Debug|Win32
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Debug|x86.Build.0 = Debug|Win32
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|Any CPU.ActiveCfg = Release|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|Any CPU.Build.0 = Release|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|x64.ActiveCfg = Release|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|x64.Build.0 = Release|x64
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|x86.ActiveCfg = Release|Win32
+		{F8B1E546-8268-460F-8CCB-5AF0B9BFBBD1}.Release|x86.Build.0 = Release|Win32
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Release|x64.ActiveCfg = Release|Any CPU
+		{B65607C5-B087-4D02-8618-7F42B7C4136B}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31970EE4-3051-45AA-A8C6-D758B694F612}
+	EndGlobalSection
+EndGlobal
