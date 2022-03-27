@@ -81,15 +81,24 @@ public:
 			//std::cout << "\n";
 			l1 = l;
 		}
-		for (auto& ptr : v) {
+		//for (auto& ptr : v) {
 			//std::cout << ptr << " ";
-		}
+		//}
 	}
 	double operator () (int x, int y) {
-		double ans;
-		if (y == 0)
-			return v[x];
-		ans = x + y*len - (y - 1) * (y - 1) / 2 + round((double)(y - 1) / 2);
+
+		double ans = y + x * len;
+		try {
+			if (y > len - x - 1)
+				throw std::string("Durachek");
+			if (x != 0)
+				ans -=(x - 1) * (x - 1) / 2 + round((double)(x - 1) / 2);
+		}
+		catch (std::string errMes) {
+			std::cout<<"\n\nError: "<<errMes;
+			exit(1);
+		}
+		
 		return v[ans];
 	}
 };
@@ -105,12 +114,16 @@ public:
 	void NewtonAnswer(bool isTwo) {
 		int fact(1);
 		double answer = masY(0, 0), dotG = gValue;
-
-		for (int i(0); i < masY.len; i++) {
-			fact *= i + 1;
-			answer += (masY(i, 1) * dotG) / fact;
-			dotG *= gValue - i - 1;
+		std::cout << answer << " ";
+		for (int i(1); i < masY.len; i++) {
+			fact *= i;
+			if (masY(i, 0) >= 0)
+				std::cout << "+ ";
+			std::cout << masY(i, 0)<< " * " << dotG << " / " << fact << " ";
+			answer += (masY(i, 0) * dotG) / fact;
+			dotG *= gValue - i;
 		}
+		std::cout << "= ";
 		_answer = answer;
 		std::cout << answer;
 	}
