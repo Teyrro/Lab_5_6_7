@@ -54,9 +54,11 @@ ax.grid(which="minor", linestyle="--", color="gray", linewidth=0.5)
 #for i in range (len(x)):
 #    if (x[i] % 0.5 == 0 and (x[i] * 10) % 10 == 5):
 #        ax.scatter(x[i], y[i], color = "orange")
-    
-ax.plot(mas[0], mas[1], "h-b")
-ax.plot(x, y, "-r", label="y = 2^x")
+ax.plot(x, y, "-r", label="y = 2^x")    
+ax.plot(mas[0], mas[1], "h-b", linestyle="--")
+
+ax.set_ylim([0, 1.8])
+ax.set_xlim([0, 3])
 #plt.stem(x, y, linefmt="r--")
 ax.legend()
 

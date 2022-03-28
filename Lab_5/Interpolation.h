@@ -14,6 +14,7 @@ private:
 	double g(int currentIndex);
 public:
 	std::vector<ValueAndAnswer> storageOfData;
+	double getYbyX(ValueAndAnswer firstPoint, ValueAndAnswer secondPoint, double xValue);
 	double value;
 	double _answer;
 public:

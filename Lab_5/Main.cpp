@@ -1,6 +1,6 @@
-#define LAGRANGE
+//#define LAGRANGE
 //#define AITKEN
-//#define NEWTON
+#define NEWTON
 
 
 #include "Interpolation.h"
