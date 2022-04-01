@@ -112,17 +112,24 @@ public:
 		gValue = (val - storageOfData[0].first) / (storageOfData[1].first - storageOfData[0].first);
 		
 	}
+
+
 	void NewtonAnswer(bool isTwo) {
-		int fact(1);
-		double answer = masY(0, 0), dotG = gValue;
+		int fact(1), iter;
+		iter = isTwo ? 1 : -1;
+		if (isTwo)gValue = (value - storageOfData[storageOfData.size() - 1].first) / (storageOfData[1].first - storageOfData[0].first);
+		double answer, dotG = gValue, delY;
+		answer = isTwo ? masY(0, masY.len - 1) : masY(0, 0);
 		std::cout << answer << " ";
 		for (int i(1); i < masY.len; i++) {
 			fact *= i;
-			if (masY(i, 0) >= 0)
+			delY = isTwo ? masY(i, masY.len - i - 1) : masY(i, 0);
+			if (delY >= 0)
 				std::cout << "+ ";
-			std::cout << masY(i, 0)<< " * " << dotG << " / " << fact << " ";
-			answer += (masY(i, 0) * dotG) / fact;
-			dotG *= gValue - i;
+			std::cout << delY << " * " << dotG << " / " << fact << " ";
+			answer += (delY * dotG) / fact;
+			dotG *= gValue + iter;
+			iter += iter/abs(iter);
 		}
 		std::cout << "= ";
 		_answer = answer;

@@ -24,7 +24,7 @@ void Interpolation::P() {
 		sum += storageOfData[i].second * g(i);
 	}
 	_answer = sum;
-	std::cout << sum << " ";
+	//std::cout << sum << " ";
 	//auto it = storageOfData.begin();
 	//for (int i(0); i < storageOfData.size();) {
 	//	if (value > storageOfData[i].first)

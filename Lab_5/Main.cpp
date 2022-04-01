@@ -16,7 +16,7 @@ int main() {
 #endif
 
 #ifdef AITKEN
-	Aitken_Interpolation f("StorageOfData.txt", 2.56);
+	Aitken_Interpolation f("StorageOfData.txt", 1.69);
 	f.FindAnswer();
 
 #endif
