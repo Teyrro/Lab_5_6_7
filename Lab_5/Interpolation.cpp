@@ -105,3 +105,52 @@ double Interpolation::getYbyX(ValueAndAnswer firstPoint, ValueAndAnswer secondPo
 	return k * xValue + b;
 }
 
+void Cubic_Spline::FindAnswer(double x) {
+	int index = _answer;
+	_answer = massH_M[index - 1].second * pow(storageOfData[index].first - value, 3) / (6 * massH_M[index].first);
+	_answer += massH_M[index].second * pow(value - storageOfData[index - 1].first, 3) / (6 * massH_M[index].first);
+	_answer += (storageOfData[index - 1].second - (massH_M[index - 1].second * pow(massH_M[index].first, 2)) / 6) * (storageOfData[index].first - value) / massH_M[index].first;
+	_answer += (storageOfData[index].second - (massH_M[index].second * pow(massH_M[index].first, 2)) / 6) * (value - storageOfData[index - 1].first) / massH_M[index].first;
+
+	std::cout << _answer;
+}
+
+
+
+void Cubic_Spline::Ñalculation() {
+	for (auto row(0); row < massH_M.size() - 2; row++) {
+		for (auto column(0); column < massH_M.size() - 1; column++) {
+			if (row == column) {
+				mtrx[row][column] = (massH_M[row].first + massH_M[row + 1].first) / 3;
+			}
+			else if (column == row + 1) {
+				mtrx[row][column] = massH_M[row + 1].first / 6;
+			}
+			else if (column == row - 1) {
+				mtrx[row][column] = massH_M[row + 1].first / 6;
+			}
+			else {
+				mtrx[row][column] = 0;
+			}
+		
+		}
+		
+	}
+
+	printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
+
+	std::vector<double> d(massH_M.size() - 2);
+	for (auto i(1); i < massH_M.size() - 1; i++) {
+		d[i - 1] = (storageOfData[i + 1].second - storageOfData[i].second) / massH_M[i].first;
+		d[i - 1] -= (storageOfData[i].second - storageOfData[i - 1].second) / massH_M[i - 1].first;
+		mtrx[i - 1][massH_M.size() - 2] = d[i - 1];
+		std::cout << d[i - 1] << " ";
+	}
+	std::cout << "\n";
+	printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
+
+
+	gaussMethod(mtrx, massH_M.size() - 1, massH_M.size() - 2, massH_M);
+
+	FindAnswer(value);
+	}

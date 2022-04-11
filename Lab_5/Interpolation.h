@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include "matrix.h"
+
 
 
 using ValueAndAnswer = std::pair<double, double>;
@@ -134,5 +136,39 @@ public:
 		std::cout << "= ";
 		_answer = answer;
 		std::cout << answer;
+	}
+};
+
+class Cubic_Spline : public Interpolation {
+	double** mtrx;
+	std::vector<std::pair<float, double>> massH_M;
+	void FindAnswer(double x);
+
+public:
+	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val) {
+		massH_M.resize(storageOfData.size());
+		_answer = 1; // index between two coordinates
+		for (auto i(0); i < massH_M.size() - 1; i++) {
+			massH_M[i].first = storageOfData[i + 1].first - storageOfData[i].first;
+			massH_M[i].second = 0;
+			if (storageOfData[i + 1].first < value) _answer++;
+		}
+		
+
+		mtrx = new double* [massH_M.size() - 2];
+
+		for (auto i(0); i < massH_M.size() - 2; i++) {
+			mtrx[i] = new double [massH_M.size() - 1];
+		}
+	}
+	void Ñalculation();
+
+	~Cubic_Spline() {
+
+		for (auto i(0); i < massH_M.size() - 2; i++) {
+			delete[] mtrx[i];
+			
+		}
+		delete[] mtrx;
 	}
 };
