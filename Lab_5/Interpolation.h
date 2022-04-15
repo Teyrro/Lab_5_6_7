@@ -4,10 +4,9 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-#include <cmath>
 #include "matrix.h"
-
-
+#include <cmath>
+#include <functional>
 
 using ValueAndAnswer = std::pair<double, double>;
 
@@ -171,4 +170,36 @@ public:
 		}
 		delete[] mtrx;
 	}
+};
+
+class Trigonometric_interpolation : public Interpolation {
+	const double pi = 3.14159265358979323846;
+	short offset;
+	double EquationA(double index);
+
+	double EquationB(double index);
+	
+public:
+	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val) {
+		offset = storageOfData[1].first - storageOfData[0].first;
+		for (short i(0); i < storageOfData.size() - 1; i++)
+		{
+			if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw "Ошибка: необходимы точки с одинаковым шагом";
+		}
+	}
+
+
+
+	void Calculation() {
+
+		double b(EquationB(0));
+		for (double step(1); step <= storageOfData.size() / 2; step++) {
+			b += EquationB(step) * cos(2 * pi * step * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+			b += EquationB(step) * sin(2 * pi * step * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+		}
+		_answer = b;
+		std::cout << _answer;
+	}
+
+
 };

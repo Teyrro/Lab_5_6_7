@@ -24,6 +24,7 @@ void Interpolation::P() {
 		sum += storageOfData[i].second * g(i);
 	}
 	_answer = sum;
+	std::cout << _answer;
 	//std::cout << sum << " ";
 	//auto it = storageOfData.begin();
 	//for (int i(0); i < storageOfData.size();) {
@@ -107,10 +108,10 @@ double Interpolation::getYbyX(ValueAndAnswer firstPoint, ValueAndAnswer secondPo
 
 void Cubic_Spline::FindAnswer(double x) {
 	int index = _answer;
-	_answer = massH_M[index - 1].second * pow(storageOfData[index].first - value, 3) / (6 * massH_M[index].first);
-	_answer += massH_M[index].second * pow(value - storageOfData[index - 1].first, 3) / (6 * massH_M[index].first);
-	_answer += (storageOfData[index - 1].second - (massH_M[index - 1].second * pow(massH_M[index].first, 2)) / 6) * (storageOfData[index].first - value) / massH_M[index].first;
-	_answer += (storageOfData[index].second - (massH_M[index].second * pow(massH_M[index].first, 2)) / 6) * (value - storageOfData[index - 1].first) / massH_M[index].first;
+	_answer = massH_M[index - 1].second * pow(storageOfData[index].first - value, 3) / (6 * massH_M[index - 1].first);
+	_answer += massH_M[index].second * pow(value - storageOfData[index - 1].first, 3) / (6 * massH_M[index - 1].first);
+	_answer += (storageOfData[index - 1].second - (massH_M[index - 1].second * pow(massH_M[index].first, 2)) / 6) * (storageOfData[index].first - value) / massH_M[index - 1].first;
+	_answer += (storageOfData[index].second - (massH_M[index].second * pow(massH_M[index].first, 2)) / 6) * (value - storageOfData[index - 1].first) / massH_M[index - 1].first;
 
 	std::cout << _answer;
 }
@@ -153,4 +154,22 @@ void Cubic_Spline::Ñalculation() {
 	gaussMethod(mtrx, massH_M.size() - 1, massH_M.size() - 2, massH_M);
 
 	FindAnswer(value);
+}
+
+double Trigonometric_interpolation::EquationA(double index) {
+	double sum(0);
+
+	for (short i(0); i < storageOfData.size() - 1; i++) {
+		sum += storageOfData[i].first * sin(2 * pi * (index * i / storageOfData.size()));
 	}
+	return sum;
+}
+
+double Trigonometric_interpolation::EquationB(double index) {
+	double sum(0);
+
+	for (short i(0); i < storageOfData.size() - 1; i++) {
+		sum += storageOfData[i].first * cos(2 * pi * (index * i / storageOfData.size()));
+	}
+	return sum;
+}

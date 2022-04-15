@@ -35,4 +35,5 @@ int main() {
 	Cubic_Spline f("StorageOfData.txt", 7);
 	f.Ñalculation();
 	f.OutputData();
+
 }
