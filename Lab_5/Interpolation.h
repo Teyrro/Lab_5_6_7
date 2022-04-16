@@ -51,7 +51,7 @@ public:
 				input >> storageOfData[i].first;
 			}
 			for (int i(0); i < size; i++) {
-				storageOfData[i].second = FuncForInterp(storageOfData[i].first);
+				input >> storageOfData[i].second;
 			}
 		}
 		else {
@@ -60,11 +60,12 @@ public:
 				input >> storageOfData[i].first;
 			}
 			for (int i(0); i < size; i++) {
-				input >> storageOfData[i].second;
+				storageOfData[i].second = FuncForInterp(storageOfData[i].first);
 			}
 		}
 		value = val;
-		
+
+		FindAnswer();
 	}
 
 	virtual void  SetNewValue(double val) {
@@ -74,7 +75,6 @@ public:
 	void OutputData();
 	void OutputDataValue();
 	void OutputDataValue(double x, double y);
-
 	virtual void FindAnswer();
 
 
@@ -82,9 +82,9 @@ public:
 
 class Aitken_Interpolation : public Interpolation {
 public:
-
-
-	Aitken_Interpolation(std::string fileName, double val) : Interpolation(fileName, val, false) {}
+	Aitken_Interpolation(std::string fileName, double val) : Interpolation(fileName, val, false) {
+		FindAnswer();
+	}
 	void FindAnswer();
 };
 
@@ -134,11 +134,15 @@ class Newton : public Interpolation {
 	double gValue;
 public:
 	Newton(std::string filename, double val) : Interpolation(filename, val, false), masY(storageOfData) {
-		gValue = (val - storageOfData[0].first) / (storageOfData[1].first - storageOfData[0].first);
+		double offset = storageOfData[1].first - storageOfData[0].first;
+		for (short i(0); i < storageOfData.size() - 1; i++)
+		{
+			if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw "ќшибка: необходимы точки с одинаковым шагом";
+		}
+		gValue = (val - storageOfData[0].first) / (offset);
 		
+		NewtonAnswer(true);
 	}
-
-
 	void NewtonAnswer(bool isTwo) {
 		int fact(1), iter;
 		iter = isTwo ? 1 : -1;
@@ -169,9 +173,9 @@ class Cubic_Spline : public Interpolation {
 
 public:
 
-	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val, true) {
+	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val, false) {
 
-		if (value > storageOfData[storageOfData.size() - 1].first)
+		if (value > storageOfData[storageOfData.size() - 1].first or value < storageOfData[0].first)
 			throw "ќшибка: »нтерпол€ци€ возможна только внутри своих узлов";
 
 		massH_M.resize(storageOfData.size());
@@ -188,17 +192,21 @@ public:
 		for (auto i(0); i < massH_M.size() - 2; i++) {
 			mtrx[i] = new double [massH_M.size() - 1];
 		}
+
+		FindAnswer();
 	}
+
 	virtual void  SetNewValue(double val) {
-		_answer = 1;
+		if (value > storageOfData[storageOfData.size() - 1].first)
+			throw "ќшибка: »нтерпол€ци€ возможна только внутри своих интервалов";
+
+		_answer = 1; // index between two coordinates
 		value = val;
 		for (auto i(0); i < massH_M.size() - 1; i++) {
 			if (storageOfData[i + 1].first < value) _answer++;
 		}
 	}
-
 	virtual void FindAnswer();
-
 	~Cubic_Spline() {
 
 		for (auto i(0); i < massH_M.size() - 2; i++) {
@@ -209,7 +217,6 @@ public:
 	}
 };
 
-
 struct ComplexValue {
 	double real;
 	double im;
@@ -218,6 +225,11 @@ struct ComplexValue {
 	void operator +=(ComplexValue a) {
 		real += a.real;
 		im += a.im;
+	}
+
+	void operator /=(int a) {
+		real /= a;
+		im /= a;
 	}
 };
 
@@ -231,7 +243,7 @@ class Trigonometric_interpolation : public Interpolation {
 	
 	ComplexValue Equation_Aj(double index);
 public:
-	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val, false), sum(0, 0) {
+	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val, true), sum(0, 0) {
 		offset = storageOfData[1].first - storageOfData[0].first;
 		for (short i(0); i < storageOfData.size() - 1; i++)
 		{
@@ -258,21 +270,16 @@ public:
 				continue;
 			}
 			std::cout << a.real << " " << a.im << " ";
+
 			ComplexValue tmp = a;
-			
 			a.real = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
 			a.im = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+			sum += a;
+
 			std::cout << a.real << " ";
 			std::cout << a.im << "  " << " cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << (2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) << "\n";
-			
-
-			//a.real = a.real / storageOfData.size();
-			//a.im = a.im / storageOfData.size();
-			sum += a;
 		}
-		sum.real = sum.real / storageOfData.size();
-		sum.im = sum.im / storageOfData.size();
-
+		sum.real /= storageOfData.size();
 		std::cout << sum.real << " " << sum.im << "\n";
 		_answer = sum.real;
 		//std::cout << _answer;

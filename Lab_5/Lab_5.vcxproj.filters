@@ -41,5 +41,6 @@
     <Text Include="StorageOfData1.txt" />
     <Text Include="StorageOfData2.txt" />
     <Text Include="StorageOfData3.txt" />
+    <Text Include="StorageOfData4.txt" />
   </ItemGroup>
 </Project>

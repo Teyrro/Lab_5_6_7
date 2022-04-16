@@ -60,8 +60,8 @@ y1 = y[0]
 y2 = y[len(y) - 1] 
 
 
-ax.set_ylim([y1, y2])
-ax.set_xlim([x1, x2])
+ax.set_ylim([y1 - y1, y2 + y2])
+ax.set_xlim([x1 - x1, x2 + x2])
 #plt.stem(x, y, linefmt="r--")
 ax.legend()
 

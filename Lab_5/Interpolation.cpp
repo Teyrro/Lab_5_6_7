@@ -129,6 +129,7 @@ void Cubic_Spline::FindAnswer(double x) {
 
 
 void Cubic_Spline::FindAnswer() {
+
 	for (auto row(0); row < massH_M.size() - 2; row++) {
 		for (auto column(0); column < massH_M.size() - 1; column++) {
 			if (row == column) {
@@ -159,7 +160,6 @@ void Cubic_Spline::FindAnswer() {
 	}
 	std::cout << "\n";
 	printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
-
 
 	gaussMethod(mtrx, massH_M.size() - 1, massH_M.size() - 2, massH_M);
 
