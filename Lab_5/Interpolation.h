@@ -19,6 +19,9 @@ public:
 	double value;
 	double _answer;
 public:
+	double startInterval;
+	double endInterval;
+
 	double virtual  FuncForInterp(double x) {
 		double value;
 		value = pow(x, 2);
@@ -40,7 +43,10 @@ public:
 
 	}
 
-	Interpolation(std::string fileName, double val, bool IsStrange) {
+	Interpolation(std::string fileName, double startInterval, double endInterval, bool IsStrange) : 
+		startInterval(startInterval),
+		endInterval(endInterval) 
+	{
 		std::ifstream input(fileName);
 		unsigned short size;
 		input >> size;
@@ -63,27 +69,42 @@ public:
 				storageOfData[i].second = FuncForInterp(storageOfData[i].first);
 			}
 		}
-		value = val;
 
-		FindAnswer();
 	}
 
 	virtual void  SetNewValue(double val) {
 		value = val;
 	}
 
-	void OutputData();
+	void OutputData(int amountGraph);
 	void OutputDataValue();
 	void OutputDataValue(double x, double y);
+
 	virtual void FindAnswer();
+
+	virtual void CreateGraph(double startInterval, double endInterval, double step) {
+		OutputData(3);
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (auto i(startInterval); i < endInterval; i += step) {
+			value = i;
+			FindAnswer();
+			OutputDataValue();
+		}
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (double i(startInterval); i < endInterval; i += step) {
+			OutputDataValue(i, FuncForInterp(i));
+		}
+	}
 
 
 };
 
 class Aitken_Interpolation : public Interpolation {
 public:
-	Aitken_Interpolation(std::string fileName, double val) : Interpolation(fileName, val, false) {
-		FindAnswer();
+	Aitken_Interpolation(std::string fileName, double startInterval, double endInterval) : Interpolation(fileName, startInterval, endInterval, false) {
+
 	}
 	void FindAnswer();
 };
@@ -132,16 +153,17 @@ public:
 class Newton : public Interpolation {
 	deltaY masY;
 	double gValue;
+
 public:
-	Newton(std::string filename, double val) : Interpolation(filename, val, false), masY(storageOfData) {
+	Newton(std::string filename, double startInterval, double endInterval) : Interpolation(filename, startInterval, endInterval, false), masY(storageOfData) {
 		double offset = storageOfData[1].first - storageOfData[0].first;
+		value = startInterval;
 		for (short i(0); i < storageOfData.size() - 1; i++)
 		{
 			if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw "ќшибка: необходимы точки с одинаковым шагом";
 		}
-		gValue = (val - storageOfData[0].first) / (offset);
+		gValue = (value - storageOfData[0].first) / (offset);
 		
-		NewtonAnswer(true);
 	}
 	void NewtonAnswer(bool isTwo) {
 		int fact(1), iter;
@@ -164,6 +186,22 @@ public:
 		_answer = answer;
 		std::cout << answer;
 	}
+
+	virtual void CreateGraph(double startInterval, double endInterval, double step, bool IsTwo) {
+		OutputData(3);
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (auto i(startInterval); i < endInterval; i++) {
+			value = i;
+			NewtonAnswer(IsTwo);
+			OutputDataValue();
+		}
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (double i(startInterval); i < endInterval; i += step) {
+			OutputDataValue(i, FuncForInterp(i));
+		}
+	}
 };
 
 class Cubic_Spline : public Interpolation {
@@ -173,8 +211,8 @@ class Cubic_Spline : public Interpolation {
 
 public:
 
-	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val, false) {
-
+	Cubic_Spline(std::string filename, double startInterval, double endInterval) : Interpolation(filename, startInterval, endInterval, true) {
+		value = startInterval;
 		if (value > storageOfData[storageOfData.size() - 1].first or value < storageOfData[0].first)
 			throw "ќшибка: »нтерпол€ци€ возможна только внутри своих узлов";
 
@@ -194,10 +232,28 @@ public:
 		}
 
 		FindAnswer();
+
+
+	}
+
+	virtual void CreateGraph(double startInterval, double endInterval, double step) {
+		OutputData(3);
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (auto i(startInterval); i < endInterval; i += step) {
+			SetNewValue(i);
+			FindAnswer(value);
+			OutputDataValue();
+		}
+
+		//OutputDataValue((endInterval - startInterval), 0);
+		//for (double i(startInterval); i < endInterval; i += step) {
+		//	OutputDataValue(i, FuncForInterp(i));
+		//}
 	}
 
 	virtual void  SetNewValue(double val) {
-		if (value > storageOfData[storageOfData.size() - 1].first)
+		if (value > storageOfData[storageOfData.size() - 1].first or value < storageOfData[0].first)
 			throw "ќшибка: »нтерпол€ци€ возможна только внутри своих интервалов";
 
 		_answer = 1; // index between two coordinates
@@ -206,6 +262,7 @@ public:
 			if (storageOfData[i + 1].first < value) _answer++;
 		}
 	}
+
 	virtual void FindAnswer();
 	~Cubic_Spline() {
 
@@ -243,47 +300,42 @@ class Trigonometric_interpolation : public Interpolation {
 	
 	ComplexValue Equation_Aj(double index);
 public:
-	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val, true), sum(0, 0) {
+	Trigonometric_interpolation(std::string filename, double startInterval, double endInterval) : 
+		Interpolation(filename, startInterval, endInterval, true), 
+		sum(0, 0) 
+	{
 		offset = storageOfData[1].first - storageOfData[0].first;
 		for (short i(0); i < storageOfData.size() - 1; i++)
 		{
 			if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw "ќшибка: необходимы точки с одинаковым шагом";
 		}
 	}
+	virtual void FindAnswer();
 
+	virtual void CreateGraph(double startInterval, double endInterval, double step) {
+		OutputData(4);
 
-
-	virtual void FindAnswer() {
-		//double b(EquationB(0));
-		//for (double step((- storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
-		//	//std::cout << " (" << EquationB(step) << ")(cos(" << 2 << "*"
-		//	b += EquationB(step) * cos(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
-		//	b += EquationA(step) * sin(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
-		//}
-
-		for (double step((-(int)storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
-			ComplexValue a(0, 0);
-			a += Equation_Aj(step);
-			if (step == 0) {
-				sum += a;
-				std::cout << a.real << " " << a.im << " \n";
-				continue;
-			}
-			std::cout << a.real << " " << a.im << " ";
-
-			ComplexValue tmp = a;
-			a.real = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
-			a.im = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
-			sum += a;
-
-			std::cout << a.real << " ";
-			std::cout << a.im << "  " << " cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << (2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) << "\n";
+		OutputDataValue((endInterval - startInterval), 0);
+		for (auto i(startInterval); i < endInterval; i += 0.1) {
+			value = i;
+			FindAnswer();
+			OutputDataValue();
 		}
-		sum.real /= storageOfData.size();
-		std::cout << sum.real << " " << sum.im << "\n";
-		_answer = sum.real;
-		//std::cout << _answer;
+
+
+		for (auto i(startInterval); i < endInterval; i++) {
+			value = i;
+			FindAnswer();
+			OutputDataValue();
+		}
+
+		OutputDataValue((endInterval - startInterval), 0);
+		for (double i(startInterval); i < endInterval; i += step) {
+			OutputDataValue(i, FuncForInterp(i));
+		}
 	}
+
+
 
 
 };

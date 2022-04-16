@@ -1,8 +1,8 @@
 //#define LAGRANGE
 //#define AITKEN
 //#define NEWTON
-#define CS
-//#define TI
+//#define CS
+#define TI
 
 
 #include "Interpolation.h"
@@ -13,30 +13,34 @@ int main() {
 	SetConsoleOutputCP(1251);
 
 #ifdef LAGRANGE
-	Interpolation f("StorageOfData0.txt", 1.69, false);
+	Interpolation f("StorageOfData0.txt", 0, 12, false);
 #endif
 
 #ifdef AITKEN
-	Aitken_Interpolation f("StorageOfData1.txt", 1.69);
-
+	Aitken_Interpolation f("StorageOfData1.txt", 0, 12);
+#define LAGRANGE
 #endif
 
 #ifdef NEWTON
-	Newton f("StorageOfData2.txt", 1.69);
+	Newton f("StorageOfData2.txt", 0, 12);
+	f.CreateGraph(f.startInterval, f.endInterval + f.endInterval, 0.1, true);
 #endif
 
 #ifdef CS
-		Cubic_Spline f("StorageOfData3.txt", 7);
+		Cubic_Spline f("StorageOfData3.txt", 1.1, 8.9);
+#define LAGRANGE
 #endif
 
 #ifdef TI
-		Trigonometric_interpolation f("StorageOfData3.txt", 7);
+		Trigonometric_interpolation f("StorageOfData3.txt", 0, 10);
+#define LAGRANGE
 #endif
 
-		f.OutputData();
-		for (double i(f.storageOfData[0].first  - 1); i < f.storageOfData[f.storageOfData.size() - 1].first ; i += 0.1) {
-			f.OutputDataValue(i, f.FuncForInterp(i));
-		}
+#ifdef LAGRANGE
+		f.CreateGraph(f.startInterval, f.endInterval, 0.1);
+#endif
+
+
 }
 
 

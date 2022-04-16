@@ -1,6 +1,7 @@
 #include "Interpolation.h"
 
 #pragma region Interpolation
+
 double Interpolation::g(int currentIndex) {
 	double dividend(1), divider(1);
 	int i(0);
@@ -24,7 +25,7 @@ void Interpolation::FindAnswer() {
 		sum += storageOfData[i].second * g(i);
 	}
 	_answer = sum;
-	std::cout << _answer;
+	std::cout << _answer << "\n";
 	//std::cout << sum << " ";
 	//auto it = storageOfData.begin();
 	//for (int i(0); i < storageOfData.size();) {
@@ -51,10 +52,10 @@ void Interpolation::OutputDataValue(double x, double y) {
 }
 
 
-void Interpolation::OutputData() {
+void Interpolation::OutputData(int amountGraph) {
 	std::ofstream myfile("../example.csv");
 	
-	myfile << storageOfData.size() + 2 << "; \n";
+	myfile << amountGraph << ";" << storageOfData.size() + 2 << "\n";
 	myfile << -100;
 	myfile << "; ";
 	myfile << getYbyX(storageOfData[0], storageOfData[1],-100);
@@ -149,21 +150,19 @@ void Cubic_Spline::FindAnswer() {
 		
 	}
 
-	printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
+	//printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
 
 	std::vector<double> d(massH_M.size() - 2);
 	for (auto i(1); i < massH_M.size() - 1; i++) {
 		d[i - 1] = (storageOfData[i + 1].second - storageOfData[i].second) / massH_M[i].first;
 		d[i - 1] -= (storageOfData[i].second - storageOfData[i - 1].second) / massH_M[i - 1].first;
 		mtrx[i - 1][massH_M.size() - 2] = d[i - 1];
-		std::cout << d[i - 1] << " ";
+		//std::cout << d[i - 1] << " ";
 	}
-	std::cout << "\n";
-	printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
+	//std::cout << "\n";
+	//printMatrix(mtrx, massH_M.size() - 1, massH_M.size() - 2);
 
 	gaussMethod(mtrx, massH_M.size() - 1, massH_M.size() - 2, massH_M);
-
-	FindAnswer(value);
 }
 #pragma endregion 
 
@@ -184,6 +183,38 @@ double Trigonometric_interpolation::EquationB(double index) {
 		sum += storageOfData[i].first * cos(2 * pi * (i * index / storageOfData.size()));
 	}
 	return sum / storageOfData.size();
+}
+
+void Trigonometric_interpolation::FindAnswer() {
+	//double b(EquationB(0));
+	//for (double step((- storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
+	//	//std::cout << " (" << EquationB(step) << ")(cos(" << 2 << "*"
+	//	b += EquationB(step) * cos(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+	//	b += EquationA(step) * sin(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+	//}
+
+	for (double step((-(int)storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
+		ComplexValue a(0, 0);
+		a += Equation_Aj(step);
+		if (step == 0) {
+			sum += a;
+			std::cout << a.real << " " << a.im << " \n";
+			continue;
+		}
+		std::cout << a.real << " " << a.im << " ";
+
+		ComplexValue tmp = a;
+		a.real = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+		a.im = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+		sum += a;
+
+		std::cout << a.real << " ";
+		std::cout << a.im << "  " << " cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << (2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) << "\n";
+	}
+	sum.real /= storageOfData.size();
+	std::cout << sum.real << " " << sum.im << "\n";
+	_answer = sum.real;
+	//std::cout << _answer;
 }
 
 ComplexValue Trigonometric_interpolation::Equation_Aj(double index) {

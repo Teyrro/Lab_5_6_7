@@ -102,8 +102,8 @@ void lineNulling(double** mtrx, int W, int H) {
 		for (j; j < H; j++) {
 			lineArithmetic(mtrx, j, i, W);
 		}
-		std::cout << '\n';
-		printMatrix(mtrx, W, H);
+		//std::cout << '\n';
+		//printMatrix(mtrx, W, H);
 	}
 }
 

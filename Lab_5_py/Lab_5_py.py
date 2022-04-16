@@ -54,14 +54,15 @@ ax.grid(which="minor", linestyle="--", color="gray", linewidth=0.5)
 ax.plot(x, y, "-r", label="y = 2^x")    
 ax.plot(mas[0], mas[1], "h-b", linestyle="--")
 
-x1 = x[0]
-x2 = x[len(x) - 1] 
-y1 = y[0]
-y2 = y[len(y) - 1] 
+x1 = min(x)
+x2 = max(x)
+y1 = min(y)
+y2 = max(y)
 
 
-ax.set_ylim([y1 - y1, y2 + y2])
-ax.set_xlim([x1 - x1, x2 + x2])
+
+ax.set_ylim([y1 + y1/10, y2 + y2/10])
+ax.set_xlim([x1 - x1/10, x2 + y2/10])
 #plt.stem(x, y, linefmt="r--")
 ax.legend()
 
