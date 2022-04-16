@@ -34,9 +34,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="StorageOfData.txt" />
+    <None Include="..\example.csv" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\example.csv" />
+    <Text Include="StorageOfData0.txt" />
+    <Text Include="StorageOfData1.txt" />
+    <Text Include="StorageOfData2.txt" />
+    <Text Include="StorageOfData3.txt" />
   </ItemGroup>
 </Project>

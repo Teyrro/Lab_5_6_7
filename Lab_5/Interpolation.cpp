@@ -1,6 +1,6 @@
 #include "Interpolation.h"
 
-
+#pragma region Interpolation
 double Interpolation::g(int currentIndex) {
 	double dividend(1), divider(1);
 	int i(0);
@@ -18,7 +18,7 @@ double Interpolation::g(int currentIndex) {
 	return dividend / divider;
 }
 
-void Interpolation::P() {
+void Interpolation::FindAnswer() {
 	double sum(0);
 	for (int i(0); i < storageOfData.size(); i++) {
 		sum += storageOfData[i].second * g(i);
@@ -45,6 +45,12 @@ void Interpolation::OutputDataValue() {
 	myfile << value << "; " << _answer << "\n";
 }
 
+void Interpolation::OutputDataValue(double x, double y) {
+	std::fstream myfile("../example.csv", std::ios::app);
+	myfile << x << "; " << y << "\n";
+}
+
+
 void Interpolation::OutputData() {
 	std::ofstream myfile("../example.csv");
 	
@@ -68,6 +74,14 @@ void Interpolation::OutputData() {
 	myfile.close();
 }
 
+double Interpolation::getYbyX(ValueAndAnswer firstPoint, ValueAndAnswer secondPoint, double xValue) {
+	double k = (secondPoint.second - firstPoint.second) / (secondPoint.first - firstPoint.first);
+	double b = firstPoint.second - k * firstPoint.first;
+	return k * xValue + b;
+}
+#pragma endregion
+
+#pragma region Aitken
 void Aitken_Interpolation::FindAnswer() {
 
 	short counter(storageOfData.size());
@@ -99,13 +113,9 @@ void Aitken_Interpolation::FindAnswer() {
 	//	}
 	//}
 }
+#pragma endregion
 
-double Interpolation::getYbyX(ValueAndAnswer firstPoint, ValueAndAnswer secondPoint, double xValue) {
-	double k = (secondPoint.second - firstPoint.second) / (secondPoint.first - firstPoint.first);
-	double b = firstPoint.second - k * firstPoint.first;
-	return k * xValue + b;
-}
-
+#pragma region CS
 void Cubic_Spline::FindAnswer(double x) {
 	int index = _answer;
 	_answer = massH_M[index - 1].second * pow(storageOfData[index].first - value, 3) / (6 * massH_M[index - 1].first);
@@ -118,7 +128,7 @@ void Cubic_Spline::FindAnswer(double x) {
 
 
 
-void Cubic_Spline::Ñalculation() {
+void Cubic_Spline::FindAnswer() {
 	for (auto row(0); row < massH_M.size() - 2; row++) {
 		for (auto column(0); column < massH_M.size() - 1; column++) {
 			if (row == column) {
@@ -155,21 +165,36 @@ void Cubic_Spline::Ñalculation() {
 
 	FindAnswer(value);
 }
+#pragma endregion 
 
+#pragma region Trigonometric_interpolation
 double Trigonometric_interpolation::EquationA(double index) {
 	double sum(0);
 
 	for (short i(0); i < storageOfData.size() - 1; i++) {
-		sum += storageOfData[i].first * sin(2 * pi * (index * i / storageOfData.size()));
+		sum += storageOfData[i].first * sin(2 * pi * (i * index / storageOfData.size()));
 	}
-	return sum;
+	return sum / storageOfData.size();
 }
 
 double Trigonometric_interpolation::EquationB(double index) {
 	double sum(0);
 
 	for (short i(0); i < storageOfData.size() - 1; i++) {
-		sum += storageOfData[i].first * cos(2 * pi * (index * i / storageOfData.size()));
+		sum += storageOfData[i].first * cos(2 * pi * (i * index / storageOfData.size()));
 	}
-	return sum;
+	return sum / storageOfData.size();
 }
+
+ComplexValue Trigonometric_interpolation::Equation_Aj(double index) {
+	ComplexValue value(0, 0);
+	for (int i(0); i < storageOfData.size(); i++) {
+		//std::cout << storageOfData[i].second << " * " << cos(-2 * pi * i * index / storageOfData.size()) << "\n";
+		//std::cout << storageOfData[i].second << " * sin - " << sin(-2 * pi * i * index / storageOfData.size()) << "\n";
+
+		value.real += storageOfData[i].second * cos(-2 * pi * i * index / storageOfData.size());
+		value.im += storageOfData[i].second * sin(-2 * pi * i * index / storageOfData.size());
+	}
+	return value;
+}
+#pragma endregion

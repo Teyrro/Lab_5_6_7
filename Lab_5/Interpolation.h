@@ -19,6 +19,13 @@ public:
 	double value;
 	double _answer;
 public:
+	double virtual  FuncForInterp(double x) {
+		double value;
+		value = pow(x, 2);
+		//value =pow(x, -1);
+		return value;
+	}
+
 	Interpolation(std::string fileName) {
 		std::ifstream input(fileName);
 		unsigned short size;
@@ -28,39 +35,56 @@ public:
 			input >> storageOfData[i].first;
 		}
 		for (int i(0); i < size; i++) {
-			input >> storageOfData[i].second;
+			storageOfData[i].second = FuncForInterp(storageOfData[i].first);
 		}
 
 	}
-	Interpolation(std::string fileName, double val) {
+
+	Interpolation(std::string fileName, double val, bool IsStrange) {
 		std::ifstream input(fileName);
 		unsigned short size;
 		input >> size;
-		storageOfData.resize(size);
-		for (int i(0); i < size; i++) {
-			input >> storageOfData[i].first;
+
+		if (IsStrange) {
+			storageOfData.resize(size);
+			for (int i(0); i < size; i++) {
+				input >> storageOfData[i].first;
+			}
+			for (int i(0); i < size; i++) {
+				storageOfData[i].second = FuncForInterp(storageOfData[i].first);
+			}
 		}
-		for (int i(0); i < size; i++) {
-			input >> storageOfData[i].second;
+		else {
+			storageOfData.resize(size);
+			for (int i(0); i < size; i++) {
+				input >> storageOfData[i].first;
+			}
+			for (int i(0); i < size; i++) {
+				input >> storageOfData[i].second;
+			}
 		}
 		value = val;
 		
 	}
-	void SetNewValue(double val) {
+
+	virtual void  SetNewValue(double val) {
 		value = val;
 	}
 
 	void OutputData();
 	void OutputDataValue();
+	void OutputDataValue(double x, double y);
 
-	void P();
+	virtual void FindAnswer();
 
 
 };
 
 class Aitken_Interpolation : public Interpolation {
 public:
-	Aitken_Interpolation(std::string fileName, double val) : Interpolation(fileName, val) {}
+
+
+	Aitken_Interpolation(std::string fileName, double val) : Interpolation(fileName, val, false) {}
 	void FindAnswer();
 };
 
@@ -109,7 +133,7 @@ class Newton : public Interpolation {
 	deltaY masY;
 	double gValue;
 public:
-	Newton(std::string filename, double val) : Interpolation(filename, val), masY(storageOfData) {
+	Newton(std::string filename, double val) : Interpolation(filename, val, false), masY(storageOfData) {
 		gValue = (val - storageOfData[0].first) / (storageOfData[1].first - storageOfData[0].first);
 		
 	}
@@ -144,7 +168,12 @@ class Cubic_Spline : public Interpolation {
 	void FindAnswer(double x);
 
 public:
-	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val) {
+
+	Cubic_Spline(std::string filename, double val) : Interpolation(filename, val, true) {
+
+		if (value > storageOfData[storageOfData.size() - 1].first)
+			throw "Ошибка: Интерполяция возможна только внутри своих узлов";
+
 		massH_M.resize(storageOfData.size());
 		_answer = 1; // index between two coordinates
 		for (auto i(0); i < massH_M.size() - 1; i++) {
@@ -160,7 +189,15 @@ public:
 			mtrx[i] = new double [massH_M.size() - 1];
 		}
 	}
-	void Сalculation();
+	virtual void  SetNewValue(double val) {
+		_answer = 1;
+		value = val;
+		for (auto i(0); i < massH_M.size() - 1; i++) {
+			if (storageOfData[i + 1].first < value) _answer++;
+		}
+	}
+
+	virtual void FindAnswer();
 
 	~Cubic_Spline() {
 
@@ -172,15 +209,29 @@ public:
 	}
 };
 
+
+struct ComplexValue {
+	double real;
+	double im;
+	ComplexValue(double real1, double im1) : real(real1), im(im1) {}
+
+	void operator +=(ComplexValue a) {
+		real += a.real;
+		im += a.im;
+	}
+};
+
 class Trigonometric_interpolation : public Interpolation {
 	const double pi = 3.14159265358979323846;
 	short offset;
-	double EquationA(double index);
+	ComplexValue sum;
 
+	double EquationA(double index);
 	double EquationB(double index);
 	
+	ComplexValue Equation_Aj(double index);
 public:
-	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val) {
+	Trigonometric_interpolation(std::string filename, double val) : Interpolation(filename, val, false), sum(0, 0) {
 		offset = storageOfData[1].first - storageOfData[0].first;
 		for (short i(0); i < storageOfData.size() - 1; i++)
 		{
@@ -190,15 +241,41 @@ public:
 
 
 
-	void Calculation() {
+	virtual void FindAnswer() {
+		//double b(EquationB(0));
+		//for (double step((- storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
+		//	//std::cout << " (" << EquationB(step) << ")(cos(" << 2 << "*"
+		//	b += EquationB(step) * cos(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+		//	b += EquationA(step) * sin(2 * pi * (step) * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+		//}
 
-		double b(EquationB(0));
-		for (double step(1); step <= storageOfData.size() / 2; step++) {
-			b += EquationB(step) * cos(2 * pi * step * (value - storageOfData[0].first) / (storageOfData.size() * offset));
-			b += EquationB(step) * sin(2 * pi * step * (value - storageOfData[0].first) / (storageOfData.size() * offset));
+		for (double step((-(int)storageOfData.size() / 2) + 1); step <= storageOfData.size() / 2; step++) {
+			ComplexValue a(0, 0);
+			a += Equation_Aj(step);
+			if (step == 0) {
+				sum += a;
+				std::cout << a.real << " " << a.im << " \n";
+				continue;
+			}
+			std::cout << a.real << " " << a.im << " ";
+			ComplexValue tmp = a;
+			
+			a.real = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+			a.im = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+			std::cout << a.real << " ";
+			std::cout << a.im << "  " << " cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << (2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) << "\n";
+			
+
+			//a.real = a.real / storageOfData.size();
+			//a.im = a.im / storageOfData.size();
+			sum += a;
 		}
-		_answer = b;
-		std::cout << _answer;
+		sum.real = sum.real / storageOfData.size();
+		sum.im = sum.im / storageOfData.size();
+
+		std::cout << sum.real << " " << sum.im << "\n";
+		_answer = sum.real;
+		//std::cout << _answer;
 	}
 
 
