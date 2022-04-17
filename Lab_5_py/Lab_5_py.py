@@ -15,6 +15,7 @@ y = []
 size = 0
 coordCount = 0
 ind = -1
+
 with open('../example.csv', 'r') as f:
     content = csv.reader(f, delimiter= ';')
     counter = 0
@@ -45,10 +46,10 @@ ax.set_ylabel("y")
 ax.grid(which="major", linewidth=1.2)
 ax.grid(which="minor", linestyle="--", color="gray", linewidth=0.5)
 
-maxX = 0
-maxY = 0
-minX = 0
-minY = 0
+maxX = [len(mas)]
+maxY = [len(mas)]
+minX = [len(mas)]
+minY = [len(mas)]
 
 colorList = ["b--","r-","k-", "y-", "m-"]
 for i in range(len(mas)):
@@ -57,21 +58,24 @@ for i in range(len(mas)):
     for j in range(len(mas[i])):
         x.append(mas[i][j][0])
         y.append(mas[i][j][1])
-    if(i == 1):
-        maxX = max(x)
-        maxY = max(y)
-        minX = min(x)
-        minY = min(y)
+    if(i >= 1):
+        maxX.append(max(x))
+        maxY.append(max(y))
+        minX.append(min(x))
+        minY.append(min(y))
     if(i == 0):
         ax.plot(x, y, "h-b", linestyle="--")
     else:
         ax.plot(x, y, colorList[i%len(colorList)])
 
+minx = min(minX)
+miny = min(minY)
 
+maxx = max(maxX)
+maxy = max(maxY)
 
-
-ax.set_ylim([minY - fabs(minY/10), maxY + maxY/10])
-ax.set_xlim([minX - fabs(minX/10), maxX + maxX/10])
+ax.set_ylim([miny - fabs((maxy - miny)/10), maxy + maxy/10])
+ax.set_xlim([minx - fabs((maxx - minx)/10), maxx + maxx/10])
 #ax.legend()
 
 

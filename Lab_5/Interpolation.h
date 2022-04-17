@@ -24,9 +24,9 @@ public:
 
 	double virtual  FuncForInterp(double x) {
 		double value;
-		//value = sqrt(x);
+		value = sqrt(x);
 		//value =pow(x, -1);
-		value = pow(x, 2);
+		//value = pow(x, 2);
 		return value;
 	}
 
@@ -85,15 +85,16 @@ public:
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
 		OutputData();
+		int size = (int)(ceil((endInterval - startInterval) / step));
 
-		OutputDataValue((endInterval - startInterval)/step, 0);
+		OutputDataValue(size, 0);
 		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
 			OutputDataValue();
 		}
 
-		OutputDataValue((endInterval - startInterval)/step, 0);
+				OutputDataValue(size, 0);
 		for (double i(startInterval);  i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
@@ -195,13 +196,14 @@ public:
 		}
 		std::cout << "= ";
 		_answer = answer;
-		std::cout << answer;
+		std::cout << answer << "\n";
 	}
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step, bool IsTwo) {
 		OutputData();
+		int size = (int)(ceil((endInterval - startInterval) / step));
 
-		OutputDataValue((endInterval - startInterval)/step, 0);
+		OutputDataValue(size, 0);
 		for (auto i(startInterval); i + step*0.1 < endInterval; i += step) {
 			value = i;
 			SetGValue();
@@ -209,7 +211,7 @@ public:
 			OutputDataValue();
 		}
 
-		OutputDataValue((endInterval - startInterval)/step, 0);
+		OutputDataValue(size, 0);
 		for (double i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
@@ -251,6 +253,7 @@ public:
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
 		try {
 			OutputData();
+			int size = (int)(ceil((endInterval - startInterval) / step));
 
 			OutputDataValue((endInterval - startInterval) / step, 0);
 			for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
@@ -333,23 +336,23 @@ public:
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
 		OutputData();
+		int size = (int)(ceil((endInterval - startInterval) / step));
 
-		OutputDataValue((endInterval - startInterval)/step, 0);
+		OutputDataValue(size, 0);
 		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
 			OutputDataValue();
 		}
 
-		OutputDataValue((endInterval - startInterval) / step, 0);
+		OutputDataValue(size, 0);
 		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
-			std::fstream myfile("../example.csv", std::ios::app);
-			myfile << value << "; " << sum.im << "\n";
+			OutputDataValue(value, sum.im);
 		}
 
-		OutputDataValue((endInterval - startInterval) / step, 0);
+		OutputDataValue(size, 0);
 		for (double i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
