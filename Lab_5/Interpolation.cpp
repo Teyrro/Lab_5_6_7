@@ -52,10 +52,11 @@ void Interpolation::OutputDataValue(double x, double y) {
 }
 
 
-void Interpolation::OutputData(int amountGraph) {
+void Interpolation::OutputData() {
 	std::ofstream myfile("../example.csv");
 	
-	myfile << amountGraph << ";" << storageOfData.size() + 2 << "\n";
+	//myfile << amountGraph << ";" << 0 << "\n";
+	myfile << storageOfData.size() + 2 << ";" << 0 << "\n";
 	myfile << -100;
 	myfile << "; ";
 	myfile << getYbyX(storageOfData[0], storageOfData[1],-100);
@@ -198,20 +199,23 @@ void Trigonometric_interpolation::FindAnswer() {
 		a += Equation_Aj(step);
 		if (step == 0) {
 			sum += a;
-			std::cout << a.real << " " << a.im << " \n";
+			std::cout << "Aj - (" << a.real << " ; " << a.im << " * i)\n\n";
 			continue;
 		}
-		std::cout << a.real << " " << a.im << " ";
+		std::cout << "Aj - (" << a.real << " ; " << a.im << " * i)\n";
 
-		ComplexValue tmp = a;
-		a.real = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
-		a.im = tmp.real * cos(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) - tmp.im * sin(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+		ComplexValue tmp(a);
+		double intoExp(2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset)));
+		a.real = tmp.real * cos(intoExp) - tmp.im * sin(intoExp);
+		a.im = tmp.real * sin(intoExp) + tmp.im * cos(intoExp);
 		sum += a;
 
-		std::cout << a.real << " ";
-		std::cout << a.im << "  " << " cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << (2 * pi * step * ((value - storageOfData[0].first) / (storageOfData.size() * offset))) << "\n";
+		std::cout << "Aj * exp() - (" << a.real << " ; " << a.im << " * i) \n";;
+		std::cout << "cos(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << cos(intoExp) << "\n";
+		std::cout << "i * sin(2 * pi * " << step << " (" << value << " - " << storageOfData[0].first << ") / " << storageOfData.size() << " * " << offset << ") - " << sin(intoExp) << " * i\n\n";
 	}
 	sum.real /= storageOfData.size();
+	sum.im /= storageOfData.size();
 	std::cout << sum.real << " " << sum.im << "\n";
 	_answer = sum.real;
 	//std::cout << _answer;

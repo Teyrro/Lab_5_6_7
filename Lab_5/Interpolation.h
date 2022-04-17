@@ -24,8 +24,9 @@ public:
 
 	double virtual  FuncForInterp(double x) {
 		double value;
-		value = pow(x, 2);
+		//value = sqrt(x);
 		//value =pow(x, -1);
+		value = pow(x, 2);
 		return value;
 	}
 
@@ -76,24 +77,24 @@ public:
 		value = val;
 	}
 
-	void OutputData(int amountGraph);
+	void OutputData();
 	void OutputDataValue();
 	void OutputDataValue(double x, double y);
 
 	virtual void FindAnswer();
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
-		OutputData(3);
+		OutputData();
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (auto i(startInterval); i < endInterval; i += step) {
+		OutputDataValue((endInterval - startInterval)/step, 0);
+		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
 			OutputDataValue();
 		}
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (double i(startInterval); i < endInterval; i += step) {
+		OutputDataValue((endInterval - startInterval)/step, 0);
+		for (double i(startInterval);  i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
 	}
@@ -153,19 +154,29 @@ public:
 class Newton : public Interpolation {
 	deltaY masY;
 	double gValue;
+	double offset;
 
 public:
 	Newton(std::string filename, double startInterval, double endInterval) : Interpolation(filename, startInterval, endInterval, false), masY(storageOfData) {
-		double offset = storageOfData[1].first - storageOfData[0].first;
-		value = startInterval;
-		for (short i(0); i < storageOfData.size() - 1; i++)
-		{
-			if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw "ќшибка: необходимы точки с одинаковым шагом";
+		try {
+			offset = storageOfData[1].first - storageOfData[0].first;
+			value = startInterval;
+			for (short i(0); i < storageOfData.size() - 1; i++)
+			{
+				if (offset != storageOfData[i + 1].first - storageOfData[i].first) throw std::string("ќшибка: необходимы точки с одинаковым шагом");
+			}
+			SetGValue();
 		}
+		catch (std::string str) {
+			std::cout << "\n\n" << str;
+			exit(1);
+		}
+	}
+	void SetGValue() {
 		gValue = (value - storageOfData[0].first) / (offset);
-		
 	}
 	void NewtonAnswer(bool isTwo) {
+		
 		int fact(1), iter;
 		iter = isTwo ? 1 : -1;
 		if (isTwo)gValue = (value - storageOfData[storageOfData.size() - 1].first) / (storageOfData[1].first - storageOfData[0].first);
@@ -188,17 +199,18 @@ public:
 	}
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step, bool IsTwo) {
-		OutputData(3);
+		OutputData();
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (auto i(startInterval); i < endInterval; i++) {
+		OutputDataValue((endInterval - startInterval)/step, 0);
+		for (auto i(startInterval); i + step*0.1 < endInterval; i += step) {
 			value = i;
+			SetGValue();
 			NewtonAnswer(IsTwo);
 			OutputDataValue();
 		}
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (double i(startInterval); i < endInterval; i += step) {
+		OutputDataValue((endInterval - startInterval)/step, 0);
+		for (double i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
 	}
@@ -237,14 +249,20 @@ public:
 	}
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
-		OutputData(3);
+		try {
+			OutputData();
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (auto i(startInterval); i < endInterval; i += step) {
-			SetNewValue(i);
-			FindAnswer(value);
-			OutputDataValue();
+			OutputDataValue((endInterval - startInterval) / step, 0);
+			for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
+				SetNewValue(i);
+				FindAnswer(value);
+				OutputDataValue();
+			}
 		}
+		catch (std::string str) {
+			std::cout << "\n\n" << str << "\n";
+		}
+		
 
 		//OutputDataValue((endInterval - startInterval), 0);
 		//for (double i(startInterval); i < endInterval; i += step) {
@@ -253,8 +271,9 @@ public:
 	}
 
 	virtual void  SetNewValue(double val) {
-		if (value > storageOfData[storageOfData.size() - 1].first or value < storageOfData[0].first)
-			throw "ќшибка: »нтерпол€ци€ возможна только внутри своих интервалов";
+		if (val > storageOfData[storageOfData.size() - 1].first or val < storageOfData[0].first)
+			throw std::string("ќшибка: »нтерпол€ци€ возможна только внутри своих интервалов " + std::to_string(storageOfData[storageOfData.size() - 1].first) + " > " +
+				std::to_string(val + 0.000001)+ " > "+std::to_string(storageOfData[0].first));
 
 		_answer = 1; // index between two coordinates
 		value = val;
@@ -301,7 +320,7 @@ class Trigonometric_interpolation : public Interpolation {
 	ComplexValue Equation_Aj(double index);
 public:
 	Trigonometric_interpolation(std::string filename, double startInterval, double endInterval) : 
-		Interpolation(filename, startInterval, endInterval, true), 
+		Interpolation(filename, startInterval, endInterval, false), 
 		sum(0, 0) 
 	{
 		offset = storageOfData[1].first - storageOfData[0].first;
@@ -313,24 +332,25 @@ public:
 	virtual void FindAnswer();
 
 	virtual void CreateGraph(double startInterval, double endInterval, double step) {
-		OutputData(4);
+		OutputData();
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (auto i(startInterval); i < endInterval; i += 0.1) {
+		OutputDataValue((endInterval - startInterval)/step, 0);
+		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
 			OutputDataValue();
 		}
 
-
-		for (auto i(startInterval); i < endInterval; i++) {
+		OutputDataValue((endInterval - startInterval) / step, 0);
+		for (auto i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			value = i;
 			FindAnswer();
-			OutputDataValue();
+			std::fstream myfile("../example.csv", std::ios::app);
+			myfile << value << "; " << sum.im << "\n";
 		}
 
-		OutputDataValue((endInterval - startInterval), 0);
-		for (double i(startInterval); i < endInterval; i += step) {
+		OutputDataValue((endInterval - startInterval) / step, 0);
+		for (double i(startInterval); i + step * 0.1 < endInterval; i += step) {
 			OutputDataValue(i, FuncForInterp(i));
 		}
 	}
